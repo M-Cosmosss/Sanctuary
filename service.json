@@ -1,0 +1,19 @@
+{
+	"ServiceGroups": {
+		"e99": {
+			"GroupName": "e99",
+			"Services": {
+				"echo": {
+					"ServiceName": "echo",
+					"ServiceType": 1,
+					"Handlers": null,
+					"GroupName": "e99"
+				}
+			},
+			"Middlewares": [
+				"log",
+				"fzjh"
+			]
+		}
+	}
+}

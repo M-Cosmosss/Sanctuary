@@ -5,8 +5,10 @@ import (
 	"net/http"
 )
 
+type Handler func(ctx *Context)
+
 // HandlersChain defines a HandlerFunc array.
-type HandlersChain []Handle
+type HandlersChain []Handler
 
 var abortIndex int = math.MaxInt32 / 2
 
@@ -16,9 +18,10 @@ type Context struct {
 	mIndex         int
 	ResponseWriter http.ResponseWriter
 	Req            *http.Request
+	Service        *Service
 }
 
-func newContext(w http.ResponseWriter,r *http.Request,h HandlersChain) *Context {
+func newContext(w http.ResponseWriter, r *http.Request, h HandlersChain) *Context {
 	return &Context{
 		ErrMsg:         "",
 		Handlers:       h,
@@ -34,6 +37,10 @@ func (c *Context) Next() {
 		c.Handlers[c.mIndex](c)
 		c.mIndex++
 	}
+}
+
+func (c *Context) HandleService(){
+	s:=c.Service
 }
 
 func (c *Context) Abort() {
