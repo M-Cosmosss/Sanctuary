@@ -3,8 +3,8 @@ package db
 import (
 	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
-import "gorm.io/gorm"
 
 var Mysql *gorm.DB
 
@@ -18,7 +18,7 @@ func MysqlInit() error {
 		return errors.Wrap(err, "mysql autoMigrate")
 	}
 
-	sql,_:=db.DB()
+	sql, _ := db.DB()
 	sql.SetMaxOpenConns(300)
 	Mysql = db
 	return nil

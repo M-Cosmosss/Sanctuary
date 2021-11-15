@@ -1,8 +1,9 @@
 package route
 
 import (
-	"github.com/pkg/errors"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 type Table map[string]*Service
@@ -18,10 +19,13 @@ type MainRouter struct {
 	GlobalMiddleware HandlersChain
 }
 
-func New() *MainRouter {
+//func New() *MainRouter {
+//
+//}
+
+func (m *MainRouter) Load() {
 
 }
-
 func (m *MainRouter) AddRoute(method string, path string, service *Service) error {
 	var err error
 	err = m.RTables.addRoute(method, path, service)
@@ -70,8 +74,6 @@ func combineHandlers(chain HandlersChain, chains ...HandlersChain) HandlersChain
 	}
 	return chain
 }
-
-
 
 type Plugin struct {
 }

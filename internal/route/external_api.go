@@ -12,7 +12,6 @@ type ExternalApiGroup struct {
 	Apis     map[string]*ExternalApi
 }
 
-
 type ExternalApiOption struct {
 	Plugins map[string]*Plugin
 }

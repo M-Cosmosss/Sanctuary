@@ -1,0 +1,34 @@
+linters-settings:
+  nakedret:
+    max-func-lines: 0 # 禁止任何不明确返回值的 return 语句
+  govet:
+    settings:
+      printf: # 分析器名称，运行 `go tool vet help` 查看所有分析器
+        funcs: # 运行 `go tool vet help printf` 查看所有 `printf` 相关的配置
+          - (unknwon.dev/clog/v2).Trace
+          - (unknwon.dev/clog/v2).Info
+          - (unknwon.dev/clog/v2).Warn
+          - (unknwon.dev/clog/v2).Error
+          - (unknwon.dev/clog/v2).ErrorDepth
+          - (unknwon.dev/clog/v2).Fatal
+          - (unknwon.dev/clog/v2).FatalDepth
+
+linters:
+  enable:
+    - bodyclose
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - nakedret
+    - gofmt
+    - ifshort
+    - rowserrcheck
+    - unconvert
+    - goimports

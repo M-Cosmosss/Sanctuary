@@ -1,11 +1,10 @@
 package main
 
 import (
-	"sanctuary/internal/route"
-	"sanctuary/internal/service"
+	"sanctuary/internal/servicecenter"
 )
 
-func main(){
+func main() {
 	//gin.Default()
 	//r:=route.New()
 	//r.Use(logg.Log)
@@ -17,26 +16,26 @@ func main(){
 	//http.Handle()
 	//http.ListenAndServe(":6788",r)
 	//service.InitServiceCenter()
-	center:=service.NewServiceCenterBasedOnTextFile(&service.TextFilePersistenceOption{FilePath: "./services.json"})
-	s:=&service.Service{
-		ServiceName: "echoo",
-		ServiceType: route.ReverseProxy,
-		Handlers:    nil,
-		GroupName:   "e999",
-	}
-	sg:=&service.ServiceGroup{
-		GroupName:   "e999",
-		Services:    make(service.ServicesMap),
-		Middlewares: nil,
-	}
-	sg.Services[s.ServiceName]=s
-	center.NewGroup(sg)
-	center.Store()
+
+	//center:=service.NewServiceCenterBasedOnTextFile(&service.TextFilePersistenceOption{FilePath: "./services.json"})
+	//s:=&service.Service{
+	//	ServiceName: "echoo",
+	//	ServiceType: route.ReverseProxy,
+	//	Handlers:    nil,
+	//	GroupName:   "e999",
+	//}
+	//sg:=&service.ServiceGroup{
+	//	GroupName:   "e999",
+	//	Services:    make(service.ServicesMap),
+	//	Middlewares: nil,
+	//}
+	//sg.Services[s.ServiceName]=s
+	//center.NewGroup(sg)
+	//center.Store()
+
+	servicecenter.Run(servicecenter.NewCenterOnTextFile(&servicecenter.TextFileOption{}))
 	//service.Build("./service.json")
 }
-
-
-
 
 //func (r *route.Router){
 //

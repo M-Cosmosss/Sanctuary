@@ -39,9 +39,9 @@ func (c *Context) Next() {
 	}
 }
 
-func (c *Context) HandleService(){
-	s:=c.Service
-}
+//func (c *Context) HandleService(){
+//	s:=c.Service
+//}
 
 func (c *Context) Abort() {
 	c.mIndex = abortIndex

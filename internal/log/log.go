@@ -9,7 +9,8 @@ type Logger struct {
 	out io.Writer
 }
 
-func Log(c *route.Context){
+func Log(c *route.Context) {
+
 	//req,w:=c.Req,c.ResponseWriter
 	//l := &db.RequestLog{
 	//	IP:      req.RemoteAddr,
