@@ -25,8 +25,11 @@ type Service struct {
 }
 
 type ServicesStore interface {
+	AddNode(ctx context.Context, id uint, url string) error
 	Create(ctx context.Context, o *NewServiceOption) error
+	Get(ctx context.Context, o *GetServiceOption) ([]*Service, error)
 	GetAll(ctx context.Context) ([]*Service, error)
+	GetByID(ctx context.Context, id uint) (*Service, error)
 	GetByNameAndGroupID(ctx context.Context, id uint, n string) (*Service, error)
 	GetServiceFromCache(id uint) (*Service, error)
 }
@@ -69,9 +72,58 @@ func (db *services) Create(ctx context.Context, o *NewServiceOption) error {
 	}
 }
 
+func (db *services) AddNode(ctx context.Context, id uint, url string) error {
+	s, err := db.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	s.Nodes = append(s.Nodes, url)
+	switch db.WithContext(ctx).Where("id = ?", id).Update("nodes", s.Nodes).Error {
+	case nil:
+		return nil
+	default:
+		log.Fatalf("AddNode error:%v", err)
+		return err
+	}
+}
+
+type GetServiceOption struct {
+	OrderBy  string
+	Page     int
+	PageSize int
+}
+
+func (db *services) Get(ctx context.Context, o *GetServiceOption) ([]*Service, error) {
+	var services []*Service
+	if o.OrderBy == "" {
+		o.OrderBy = "group_id ASC,name ASC"
+	}
+	if o.Page <= 0 {
+		o.Page = 1
+	}
+	if o.PageSize <= 0 {
+		o.PageSize = 50
+	}
+	return services, db.WithContext(ctx).
+		Offset((o.Page - 1) * o.PageSize).Limit(o.PageSize).Order(o.OrderBy).
+		Find(&services).Error
+}
+
 func (db *services) GetAll(ctx context.Context) ([]*Service, error) {
 	var s []*Service
 	return s, db.WithContext(ctx).Find(&s).Error
+}
+
+func (db *services) GetByID(ctx context.Context, id uint) (*Service, error) {
+	var s *Service
+	switch db.WithContext(ctx).Where("id = ?", id).First(s).Error {
+	case nil:
+		return s, nil
+	case gorm.ErrRecordNotFound:
+		return nil, ErrServiceNotExists
+	default:
+		return nil, ErrUnknown
+	}
 }
 
 func (db *services) GetByNameAndGroupID(ctx context.Context, id uint, n string) (*Service, error) {

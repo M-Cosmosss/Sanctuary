@@ -6,9 +6,10 @@ import (
 	"github.com/flamego/flamego"
 )
 
-var center = NewCenterHandler()
 var route = NewRouteHandler()
 var routeGroup = NewRouteGroupHandler()
+var service = NewServiceHandler()
+var serviceGroup = NewServiceGroupHandler()
 
 func NewRouter() {
 	f := flamego.Classic()
@@ -27,9 +28,10 @@ func NewRouter() {
 		})
 
 		f.Group("/center", func() {
-			f.Get("/service", center.ListAll)
+			f.Get("/service", form.Bind(form.GetServiceOption{}), service.List)
 			f.Post("/group")
-			f.Post("/service")
+			f.Post("/service", form.Bind(form.NewService{}), service.New)
+			f.Post("/register", form.Bind(form.NewService{}), service.New)
 		})
 	})
 	f.Run()
