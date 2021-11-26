@@ -2,14 +2,14 @@ package log
 
 import (
 	"io"
-	"sanctuary/internal/route"
+	"sanctuary/internal/backend"
 )
 
 type Logger struct {
 	out io.Writer
 }
 
-func Log(c *route.Context) {
+func Log(c *backend.Context) {
 
 	//req,w:=c.Req,c.ResponseWriter
 	//l := &db.RequestLog{

@@ -42,3 +42,17 @@ func (s *ServiceHandler) New(ctx Context, f form.NewService) error {
 		return ctx.ServerError()
 	}
 }
+
+func (s *ServiceHandler) RegisterNode(ctx Context, f form.NewServiceNode) error {
+	switch db.Services.AddNode(ctx.Request().Context(), f.ServiceID, f.Url) {
+	case nil:
+		return ctx.Success()
+	case db.ErrServiceNotExists:
+		return ctx.Error(400, "ServiceID does not exist.")
+	case db.ErrServiceNodeAlreadyExists:
+		return ctx.Error(400, db.ErrServiceNodeAlreadyExists.Error())
+	default:
+		log.Printf("RegisterNode error: URL:%s id:%d", f.Url, f.ServiceID)
+		return ctx.ServerError()
+	}
+}

@@ -105,61 +105,13 @@ func (db *routes) GetByGroupID(ctx context.Context, gid uint) ([]*Route, error) 
 }
 
 func (db *routes) GetByMethodAndPath(ctx context.Context, method string, fullPath string) (*Route, error) {
-	r := &Route{}
-	switch db.WithContext(ctx).Model(&Route{}).Where("full_path = ? AND method = ?", fullPath, method).First(r).Error {
+	var r Route
+	switch db.WithContext(ctx).Model(&Route{}).Where("full_path = ? AND method = ?", fullPath, method).First(&r).Error {
 	case nil:
-		return r, nil
+		return &r, nil
 	case gorm.ErrRecordNotFound:
 		return nil, ErrRouteNotExists
 	default:
 		return nil, ErrUnknown
 	}
 }
-
-//func (db *routes) Store(m *RouteGroup) error {
-//	if err := db.Where("1=1").Delete(&Route{}).Error; err != nil {
-//		panic(err)
-//	}
-//	routes := make([]*Route, 0)
-//	for _, v := range m {
-//		for _, r := range v.Routes {
-//			routes = append(routes, &Route{
-//				Method: r.Method,
-//				Path:   r.Path,
-//				//Group:        r.Group,
-//				//Plugin:       r.Plugin,
-//				//Service:      r.Service,
-//				//ServiceGroup: r.ServiceGroup,
-//			})
-//		}
-//	}
-//	if err := db.Create(routes).Error; err != nil {
-//		log.Println("Store error")
-//		return err
-//	}
-//	return nil
-//}
-//
-//func (db *routes) Load(m *gateway.MainRouter) error {
-//	//if len(m.RTables) != 0 {
-//	//	return errors.New("Must load in a new router")
-//	//}
-//	//routes := []*Route{}
-//	//if err := db.Model(&Route{}).Find(routes).Error; err != nil {
-//	//	return err
-//	//}
-//	//for _, v := range routes {
-//	//	if _, ok := m.RouteGroups[v.Group]; !ok {
-//	//		m.RouteGroups[v.Group] = &gateway.RouteGroup{Plugin: v.Plugin}
-//	//	}
-//	//	m.RouteGroups[v.Group].Routes = append(m.RouteGroups[v.Group].Routes, &gateway.Route{
-//	//		Method:       v.Method,
-//	//		Path:         v.Path,
-//	//		Group:        v.Group,
-//	//		Plugin:       v.Plugin
-//	//		Service:      v.Service,
-//	//		ServiceGroup: v.ServiceGroup,
-//	//	})
-//	//}
-//	return nil
-//}

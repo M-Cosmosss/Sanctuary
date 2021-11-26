@@ -3,12 +3,14 @@ package main
 import (
 	"sanctuary/internal/backend"
 	"sanctuary/internal/db"
+	"sanctuary/internal/gateway"
 )
 
 func main() {
 	//var err error
 	db.Init()
 	backend.NewRouter()
+	gateway.Run()
 	//err = db.RouteGroups.Create(&db.NewRouteGroupOption{
 	//	Name:   "group1",
 	//	Path:   "/1",

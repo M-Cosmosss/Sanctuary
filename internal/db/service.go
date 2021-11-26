@@ -13,7 +13,13 @@ var Services ServicesStore
 var _ ServicesStore = &services{}
 
 func NewServicesStore(db *gorm.DB) *services {
-	return &services{DB: db}
+	s := &services{
+		DB:     db,
+		cache:  make(map[uint]*Service),
+		IsSync: false,
+	}
+	s.Init()
+	return s
 }
 
 type Service struct {
@@ -25,6 +31,7 @@ type Service struct {
 }
 
 type ServicesStore interface {
+	Init()
 	AddNode(ctx context.Context, id uint, url string) error
 	Create(ctx context.Context, o *NewServiceOption) error
 	Get(ctx context.Context, o *GetServiceOption) ([]*Service, error)
@@ -43,6 +50,10 @@ type NewServiceOption struct {
 	Name    string
 	Health  []string
 	GroupID uint
+}
+
+func (db *services) Init() {
+	go db.Syncer()
 }
 
 func (db *services) Create(ctx context.Context, o *NewServiceOption) error {
@@ -77,8 +88,14 @@ func (db *services) AddNode(ctx context.Context, id uint, url string) error {
 	if err != nil {
 		return err
 	}
+	//TODO: can be realized with the sql feature
+	for _, node := range s.Nodes {
+		if node == url {
+			return ErrServiceNodeAlreadyExists
+		}
+	}
 	s.Nodes = append(s.Nodes, url)
-	switch db.WithContext(ctx).Where("id = ?", id).Update("nodes", s.Nodes).Error {
+	switch db.WithContext(ctx).Model(&Service{}).Where("id = ?", id).Update("nodes", s.Nodes).Error {
 	case nil:
 		return nil
 	default:
@@ -115,10 +132,10 @@ func (db *services) GetAll(ctx context.Context) ([]*Service, error) {
 }
 
 func (db *services) GetByID(ctx context.Context, id uint) (*Service, error) {
-	var s *Service
-	switch db.WithContext(ctx).Where("id = ?", id).First(s).Error {
+	var s Service
+	switch db.WithContext(ctx).Where("id = ?", id).First(&s).Error {
 	case nil:
-		return s, nil
+		return &s, nil
 	case gorm.ErrRecordNotFound:
 		return nil, ErrServiceNotExists
 	default:
@@ -127,10 +144,10 @@ func (db *services) GetByID(ctx context.Context, id uint) (*Service, error) {
 }
 
 func (db *services) GetByNameAndGroupID(ctx context.Context, id uint, n string) (*Service, error) {
-	var s *Service
-	switch db.WithContext(ctx).Where("group_id = ? AND name = ?", id, n).Error {
+	var s Service
+	switch db.WithContext(ctx).Where("group_id = ? AND name = ?", id, n).First(&s).Error {
 	case nil:
-		return s, nil
+		return &s, nil
 	case gorm.ErrRecordNotFound:
 		return nil, ErrServiceNotExists
 	default:

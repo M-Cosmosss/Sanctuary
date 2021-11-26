@@ -16,4 +16,6 @@ var ErrServiceGroupNotExists = errors.New("Service Group does not exist.")
 
 var ErrUnknown = errors.New("Unknown database error.")
 
-var ErrNotHTTPMethod = errors.New("Method is not in the HTTP")
+var ErrNotHTTPMethod = errors.New("Method is not in the HTTP.")
+
+var ErrServiceNodeAlreadyExists = errors.New("Node is already in the service.")

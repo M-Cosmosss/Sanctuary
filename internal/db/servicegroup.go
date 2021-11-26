@@ -47,7 +47,7 @@ func (db *serviceGroups) Create(ctx context.Context, g *NewServiceGroupOption) e
 }
 
 func (db *serviceGroups) GetByID(ctx context.Context, id uint) (*ServiceGroup, error) {
-	var sg *ServiceGroup
+	sg := &ServiceGroup{}
 	switch db.WithContext(ctx).Where("id = ?", id).First(sg).Error {
 	case nil:
 		return sg, nil

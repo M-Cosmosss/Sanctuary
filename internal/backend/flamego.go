@@ -17,24 +17,27 @@ func NewRouter() {
 	f.Group("/api", func() {
 
 		f.Group("/gateway", func() {
-			f.Get("/route", form.Bind(form.GetRouteOption{}), route.List)
-			f.Post("/route", form.Bind(form.NewRoute{}), route.New)
-			f.Put("/route")
-			f.Delete("/route")
-			f.Get("/group", routeGroup.List)
-			f.Post("/group", form.Bind(form.NewRouteGroup{}), routeGroup.New)
-			f.Put("/group")
-			f.Delete("/group")
+			f.Combo("/route").
+				Get(form.Bind(form.GetRouteOption{}), route.List).
+				Post(form.Bind(form.NewRoute{}), route.New).
+				Put().
+				Delete()
+			f.Combo("/group").
+				Get(routeGroup.List).
+				Post(form.Bind(form.NewRouteGroup{}), routeGroup.New).
+				Put().
+				Delete()
 		})
 
 		f.Group("/center", func() {
-			f.Get("/service", form.Bind(form.GetServiceOption{}), service.List)
-			f.Post("/group")
-			f.Post("/service", form.Bind(form.NewService{}), service.New)
-			f.Post("/register", form.Bind(form.NewService{}), service.New)
+			f.Combo("/service").
+				Get(form.Bind(form.GetServiceOption{}), service.List).
+				Post(form.Bind(form.NewService{}), service.New)
+			f.Post("/register", form.Bind(form.NewServiceNode{}), service.RegisterNode)
+			f.Post("/group", form.Bind(form.NewServiceGroup{}), serviceGroup.New)
 		})
 	})
-	f.Run()
+	go f.Run()
 }
 
 func Run() {

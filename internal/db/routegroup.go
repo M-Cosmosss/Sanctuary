@@ -64,10 +64,10 @@ func (db *routeGroups) Get(ctx context.Context) ([]*RouteGroup, error) {
 }
 
 func (db *routeGroups) GetByID(ctx context.Context, id uint) (*RouteGroup, error) {
-	g := &RouteGroup{}
-	switch db.WithContext(ctx).Model(&RouteGroup{}).Where("id = ?", id).First(g).Error {
+	var g RouteGroup
+	switch db.WithContext(ctx).Model(&RouteGroup{}).Where("id = ?", id).First(&g).Error {
 	case nil:
-		return g, nil
+		return &g, nil
 	case gorm.ErrRecordNotFound:
 		return nil, ErrRouteGroupNotExists
 	default:
@@ -76,10 +76,10 @@ func (db *routeGroups) GetByID(ctx context.Context, id uint) (*RouteGroup, error
 }
 
 func (db *routeGroups) GetByName(ctx context.Context, n string) (*RouteGroup, error) {
-	g := &RouteGroup{}
-	switch db.WithContext(ctx).Model(&RouteGroup{}).Where("name = ?", n).First(g).Error {
+	var g RouteGroup
+	switch db.WithContext(ctx).Model(&RouteGroup{}).Where("name = ?", n).First(&g).Error {
 	case nil:
-		return g, nil
+		return &g, nil
 	case gorm.ErrRecordNotFound:
 		return nil, ErrRouteGroupNotExists
 	default:
