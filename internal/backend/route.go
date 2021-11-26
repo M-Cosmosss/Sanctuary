@@ -2,7 +2,6 @@ package backend
 
 import (
 	"log"
-	"path"
 	"sanctuary/internal/db"
 	"sanctuary/internal/form"
 )
@@ -27,28 +26,23 @@ func (r *RouteHandler) List(ctx Context, f form.GetRouteOption) error {
 }
 
 func (r *RouteHandler) New(ctx Context, f form.NewRoute) error {
-	g, err := db.RouteGroups.GetByID(ctx.Request().Context(), f.GroupID)
-	switch err {
-	case nil:
-		break
-	case db.ErrRouteGroupNotExists:
-		return ctx.Error(404, "RouteGroup ID not found.")
-	default:
-		return ctx.ServerError()
-	}
-	err = db.Routes.Create(ctx.Request().Context(), &db.NewRouteOption{
+	err := db.Routes.Create(ctx.Request().Context(), &db.NewRouteOption{
 		Method:    f.Method,
-		FullPath:  path.Join(g.Path, f.Path),
 		Path:      f.Path,
-		GroupID:   g.ID,
+		GroupID:   f.GroupID,
 		ServiceID: f.ServiceID,
 	})
 	switch err {
 	case nil:
 		return ctx.Success()
+	case db.ErrRouteGroupNotExists:
+		return ctx.Error(400, "Route group not exists.")
 	case db.ErrRouteAlreadyExists:
 		return ctx.Error(400, "Route path already exists.")
+	case db.ErrNotHTTPMethod:
+		return ctx.Error(400, "Route is not the HTTP method.")
 	default:
+		log.Println("RouteHandler.New: unknown error")
 		return ctx.ServerError()
 	}
 }

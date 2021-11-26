@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/http"
 	"path"
 
 	"github.com/jackc/pgconn"
@@ -27,4 +28,8 @@ func CheckURL(u string) error {
 func IsUniqueError(err error, constraint string) bool {
 	pgError, ok := err.(*pgconn.PgError)
 	return ok && pgError.Code == "23505" && pgError.ConstraintName == constraint
+}
+
+func IsHTTPMethod(s string) bool {
+	return s == http.MethodGet || s == http.MethodPost || s == http.MethodPut || s == http.MethodHead || s == http.MethodOptions || s == http.MethodDelete || s == http.MethodConnect
 }

@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"path"
+	"sanctuary/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -31,6 +33,7 @@ type RouteStore interface {
 	//Store(m *gateway.MainRouter) error
 	Create(ctx context.Context, g *NewRouteOption) error
 	Get(ctx context.Context, o *GetRouteOption) ([]*Route, error)
+	GetAllOrderByMethod(ctx context.Context) ([]*Route, error)
 	GetByGroupID(ctx context.Context, gid uint) ([]*Route, error)
 	GetByMethodAndPath(ctx context.Context, method string, fullPath string) (*Route, error)
 	//DeleteRoute(DeleteRouteOption) error
@@ -39,24 +42,29 @@ type RouteStore interface {
 
 type NewRouteOption struct {
 	Method    string
-	FullPath  string
 	Path      string
 	GroupID   uint
 	ServiceID uint
 }
 
 func (db *routes) Create(ctx context.Context, o *NewRouteOption) error {
+	if !utils.IsHTTPMethod(o.Method) {
+		return ErrNotHTTPMethod
+	}
+	g, err := RouteGroups.GetByID(ctx, o.GroupID)
+	if err != nil {
+		return err
+	}
 	r := &Route{
 		Method:    o.Method,
-		FullPath:  o.FullPath,
+		FullPath:  path.Join(g.Path, o.Path),
 		Path:      o.Path,
 		GroupID:   o.GroupID,
 		ServiceID: o.ServiceID,
 	}
-	if _, err := db.GetByMethodAndPath(ctx, o.Method, o.FullPath); err != ErrRouteNotExists {
+	if _, err = db.GetByMethodAndPath(ctx, r.Method, r.FullPath); err != ErrRouteNotExists {
 		return ErrRouteAlreadyExists
 	}
-
 	switch db.WithContext(ctx).Create(r).Error {
 	case nil:
 		return nil
@@ -71,6 +79,10 @@ type GetRouteOption struct {
 	PageSize int
 }
 
+func (db *routes) GetAllOrderByMethod(ctx context.Context) ([]*Route, error) {
+	var routes []*Route
+	return routes, db.WithContext(ctx).Order("method").Find(&routes).Error
+}
 func (db *routes) Get(ctx context.Context, o *GetRouteOption) ([]*Route, error) {
 	var routes []*Route
 	if o.OrderBy == "" {

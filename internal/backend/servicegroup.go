@@ -12,7 +12,7 @@ func NewServiceGroupHandler() *ServiceGroupHandler {
 }
 
 func (r *ServiceGroupHandler) New(ctx Context, f form.NewServiceGroup) error {
-	if err := db.ServiceGroups.NewServiceGroup(&db.NewServiceGroupOption{
+	if err := db.ServiceGroups.Create(ctx.Request().Context(), &db.NewServiceGroupOption{
 		Name:   f.Name,
 		Plugin: f.Plugin,
 	}); err != nil {

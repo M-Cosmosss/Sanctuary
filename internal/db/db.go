@@ -36,7 +36,7 @@ func Init() error {
 func SetDatabaseStore(db *gorm.DB) {
 	Routes = NewRouteStore(db)
 	RouteGroups = NewRouteGroupsStore(db)
-	Services = NewServi
+	Services = NewServicesStore(db)
 	ServiceGroups = NewServiceGroupsStore(db)
 }
 
@@ -44,6 +44,10 @@ func TableInit() {
 	RouteGroups.Create(context.Background(), &NewRouteGroupOption{
 		Name:   "Default",
 		Path:   "/",
+		Plugin: nil,
+	})
+	ServiceGroups.Create(context.Background(), &NewServiceGroupOption{
+		Name:   "Default",
 		Plugin: nil,
 	})
 }
